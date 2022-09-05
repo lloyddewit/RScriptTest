@@ -3,6 +3,7 @@ Imports Xunit
 Public Class clsRScriptTestUnit
     <Fact>
     Sub TestGetLstLexemes()
+        'TODO remove this comment, it's just to test GitHub push works correctly
 
         Dim clsRScript As RScript.clsRScript = New RScript.clsRScript("")
 
@@ -459,13 +460,13 @@ Public Class clsRScriptTestUnit
     Sub TestGetAsExecutableScript()
         Dim strInput, strActual As String
 
-        strInput = "x[3:5]<-13:15;names(x)[3]<-""Three""" & vbLf
+        strInput = "x[3:5]<-13:15;names(x)[3]<-"" Three""" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
 
-        strInput = "f1(f2(),f3(a),f4(b=1),f5(c=2,3),f6(4,d=5),f7(,),f8(,,),f9(,,,),f10(a,,))" & vbLf
+        strInput = " f1(f2(),f3(a),f4(b=1),f5(c=2,3),f6(4,d=5),f7(,),f8(,,),f9(,,,),f10(a,,))" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal("f1(f2(),f3(a),f4(b =1),f5(c =2,3),f6(4,d =5),f7(,),f8(,,),f9(,,,),f10(a,,))" & vbLf, strActual)
+        Assert.Equal(" f1(f2(),f3(a),f4(b =1),f5(c =2,3),f6(4,d =5),f7(,),f8(,,),f9(,,,),f10(a,,))" & vbLf, strActual)
 
         strInput = "f0(f1(),f2(a),f3(f4()),f5(f6(f7(b))))" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
@@ -658,6 +659,68 @@ Public Class clsRScriptTestUnit
         strInput = Nothing
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal("", strActual)
+
+        ' Test string constants that contain line breaks
+        strInput = "x <- ""a" & vbLf & """" & vbLf &
+                   "fn1(""bc " & vbLf & "d"", e)" & vbLf &
+                   "fn2( ""f gh" & vbLf & """,i)" & vbLf &
+                   "x <- 'a" & vbCr & vbCr & "'" & vbLf &
+                   "fn1('bc " & vbCr & vbCr & vbCr & vbCr & "d', e)" & vbLf &
+                   "fn2( 'f gh" & vbCr & "',i)" & vbLf &
+                   "x <- `a" & vbCrLf & "`" & vbLf &
+                   "fn1(`bc " & vbCrLf & "j" & vbCrLf & "d`, e)" & vbLf &
+                   "fn2( `f gh" & vbCrLf & "kl" & vbCrLf & "mno" & vbCrLf & "`,i)" & vbLf
+
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        ' https://github.com/africanmathsinitiative/R-Instat/issues/7095  
+        strInput = "data_book$import_data(data_tables =list(data3 =clipr::read_clip_tbl(x =""Category    Feature    Ease_of_Use     Operating Systems" &
+                   vbLf & """, header =TRUE)))" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        ' https://github.com/africanmathsinitiative/R-Instat/issues/7095  
+        strInput = "Data <- data_book$get_data_frame(data_name = ""Data"")" & vbLf &
+                "last_graph <- ggplot2::ggplot(data = Data %>% dplyr::filter(rain > 0.85), mapping = ggplot2::aes(y = rain, x = make_factor("""")))" &
+                    " + ggplot2::geom_boxplot(varwidth = TRUE, coef = 2) + theme_grey()" &
+                    " + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5))" &
+                    " + ggplot2::xlab(NULL) + ggplot2::facet_wrap(facets = ~ Name, drop = FALSE)" & vbLf &
+                "data_book$add_graph(graph_name = ""last_graph"", graph = last_graph, data_name = ""Data"")" & vbLf &
+                "data_book$get_graphs(data_name = ""Data"", graph_name = ""last_graph"")" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        ' https://github.com/africanmathsinitiative/R-Instat/issues/7095  
+        strInput = "ifelse(year_2 > 30, 1, 0)" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        ' https://github.com/africanmathsinitiative/R-Instat/issues/7377
+        strInput = "(year-1900)*(year<2000)+(year-2000)*(year>1999)" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        'Test string constants that have quotes embedded inside
+        strInput = "a("""", ""\""\"""", ""b"", ""c(\""d\"")"", ""'"", ""''"", ""'e'"", ""`"", ""``"", ""`f`"")" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a('', '\'\'', 'b', 'c(\'d\')', '""', '""""', '""e""', '`', '``', '`f`')" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a(``, `\`\``, `b`, `c(\`d\`)`, `""`, `""""`, `""e""`, `'`, `''`, `'f'`)" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "x<-""she said 'hello'""" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "read_clip_tbl(x = ""Ease_of_Use" & vbTab & "Hides R by default to prevent \""code shock\""" & vbTab & "  1"", header = TRUE)" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
 
     End Sub
 
