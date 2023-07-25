@@ -724,6 +724,18 @@ Public Class clsRScriptTestUnit
 
     End Sub
 
+    <Fact>
+    Sub TestRInstatIssue8285()
+        Dim clsRScript As RScript.clsRScript = New RScript.clsRScript("")
+
+        'test token list - RSyntacticName
+        Dim strInput As String = "for (i in c(-8, 9, 11, 45)) {print(i)}"
+        Dim lstInput As List(Of String) = clsRScript.GetLstLexemes(strInput)
+        Dim strExpected As String = "for(RKeyWord),  (RSpace), ((RBracket), i(RSyntacticName),  (RSpace), in(RKeyWord),  (RSpace), c(RFunctionName), ((RBracket), -(ROperatorUnaryRight), 8(RSyntacticName), ,(RSeparator),  (RSpace), 9(RSyntacticName), ,(RSeparator),  (RSpace), 11(RSyntacticName), ,(RSeparator),  (RSpace), 45(RSyntacticName), )(RBracket), )(RBracket),  (RSpace), {(RBracket), print(RFunctionName), ((RBracket), i(RSyntacticName), )(RBracket), }(REndScript), "
+        Dim strActual As String = GetLstTokensAsString(clsRScript.GetLstTokens(lstInput))
+        Assert.Equal(strExpected, strActual)
+    End Sub
+
     Private Function GetLstTokensAsString(lstRTokens As List(Of RScript.clsRToken)) As String
 
         If lstRTokens Is Nothing OrElse lstRTokens.Count = 0 Then
