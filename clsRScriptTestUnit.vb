@@ -632,32 +632,61 @@ Public Class clsRScriptTestUnit
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
 
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
+        Assert.Equal("f1(f2(),f3(a),f4(b =1))" & vbLf &
+                     "f0(o4a =o4b,o4c =(o8a+o8b)*(o8c-o8d),o4d =f4a(o6e =o6f,o6g =o6h))" & vbLf &
+                     "a/(b)*(c)+(d-e)/f*g+(((d-e)/f)*g)" & vbLf &
+                     "a+b+c" & vbLf &
+                     "endSyntacticName" & vbLf,
+                     strActual)
+
         strInput = "#comment1" & vbLf & "a#comment2" & vbCr & " b #comment3" & vbCrLf & "#comment4" & vbLf & "  c  " & vbCrLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal("#comment1" & vbLf & "a#comment2" & vbLf & " b #comment3" & vbLf & "#comment4" & vbLf & "  c  " & vbLf, strActual)
 
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
+        Assert.Equal("a" & vbLf & "b" & vbLf & "c" & vbLf, strActual)
+
         strInput = "#ignored comment"
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(vbLf, strActual)
+
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
         Assert.Equal(vbLf, strActual)
 
         strInput = "#ignored comment" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(vbLf, strActual)
 
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
+        Assert.Equal(vbLf, strActual)
+
         strInput = "f1()" & vbLf & "#ignored comment" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal("f1()" & vbLf, strActual)
+
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
         Assert.Equal("f1()" & vbLf, strActual)
 
         strInput = vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(vbLf, strActual)
 
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
+        Assert.Equal(vbLf, strActual)
+
         strInput = ""
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal("", strActual)
 
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
+        Assert.Equal("", strActual)
+
         strInput = Nothing
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal("", strActual)
+
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
         Assert.Equal("", strActual)
 
         ' Test string constants that contain line breaks
@@ -673,6 +702,18 @@ Public Class clsRScriptTestUnit
 
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
+        Assert.Equal("x<-""a" & vbLf & """" & vbLf &
+                     "fn1(""bc " & vbLf & "d"",e)" & vbLf &
+                     "fn2(""f gh" & vbLf & """,i)" & vbLf &
+                     "x<-'a" & vbCr & vbCr & "'" & vbLf &
+                     "fn1('bc " & vbCr & vbCr & vbCr & vbCr & "d',e)" & vbLf &
+                     "fn2('f gh" & vbCr & "',i)" & vbLf &
+                     "x<-`a" & vbCrLf & "`" & vbLf &
+                     "fn1(`bc " & vbCrLf & "j" & vbCrLf & "d`,e)" & vbLf &
+                     "fn2(`f gh" & vbCrLf & "kl" & vbCrLf & "mno" & vbCrLf & "`,i)" & vbLf,
+                     strActual)
 
         ' https://github.com/africanmathsinitiative/R-Instat/issues/7095  
         strInput = "data_book$import_data(data_tables =list(data3 =clipr::read_clip_tbl(x =""Category    Feature    Ease_of_Use     Operating Systems" &
