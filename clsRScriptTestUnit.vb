@@ -1,3 +1,4 @@
+Imports System.Collections.Specialized
 Imports Xunit
 
 Public Class clsRScriptTestUnit
@@ -463,10 +464,17 @@ Public Class clsRScriptTestUnit
         strInput = "x[3:5]<-13:15;names(x)[3]<-"" Three""" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+        Dim lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(2, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(14, lstScriptPos(1))
 
         strInput = " f1(f2(),f3(a),f4(b=1),f5(c=2,3),f6(4,d=5),f7(,),f8(,,),f9(,,,),f10(a,,))" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(" f1(f2(),f3(a),f4(b =1),f5(c =2,3),f6(4,d =5),f7(,),f8(,,),f9(,,,),f10(a,,))" & vbLf, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(1, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
 
         strInput = "f0(f1(),f2(a),f3(f4()),f5(f6(f7(b))))" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
@@ -527,10 +535,18 @@ Public Class clsRScriptTestUnit
         strInput = "df[[""a""]]" & vbLf & "lst[[""a""]][[""b""]]" & vbLf 'same as 'df$a' and 'lst$a$b'
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(2, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(10, lstScriptPos(1))
 
         strInput = "x<-""a"";df[x]" & vbLf 'same as 'df$a' and 'lst$a$b'
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(2, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(7, lstScriptPos(1))
 
         strInput = "df<-data.frame(x = 1:10, y = 11:20, z = letters[1:10])" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
