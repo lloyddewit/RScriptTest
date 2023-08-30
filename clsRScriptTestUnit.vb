@@ -555,6 +555,10 @@ Public Class clsRScriptTestUnit
         strInput = "x[3:5]<-13:15;names(x)[3]<-""Three""" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(2, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(14, lstScriptPos(1))
 
         strInput = "data_book$display_daily_table(data_name = ""dodoma"", climatic_element = ""rain"", " &
                    "date_col = ""Date"", year_col = ""year"", Misscode = ""m"", monstats = c(sum = ""sum""))" & vbLf
@@ -586,10 +590,23 @@ Public Class clsRScriptTestUnit
                    "data_book$get_graphs(data_name = ""dodoma"", graph_name = ""last_graph"")" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(4, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(139, lstScriptPos(1))
+        Assert.Equal(534, lstScriptPos(2))
+        Assert.Equal(623, lstScriptPos(3))
 
         strInput = "a->b" & vbLf & "c->>d" & vbLf & "e<-f" & vbLf & "g<<-h" & vbLf & "i=j" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(5, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(5, lstScriptPos(1))
+        Assert.Equal(11, lstScriptPos(2))
+        Assert.Equal(16, lstScriptPos(3))
+        Assert.Equal(22, lstScriptPos(4))
 
         strInput = "x<-df$`a b`" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
@@ -634,6 +651,10 @@ Public Class clsRScriptTestUnit
         strInput = " a  [" & vbCr & "   1" & vbLf & "] -  b   [c (  d   )+ e  ]   /f (  g   [2 ]  ,   h[ " & vbCrLf & "3  ]  " & vbLf & " ,i [  4   ]* j  [   5] )  -   k[ l  [   m[ 6  ]   ]   ]" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(" a  [" & vbCr & "   1] -  b   [c(  d)+ e]   /f(  g   [2],   h[ " & vbCrLf & "3],i [  4]* j  [   5]) -   k[ l  [   m[ 6]]]" & vbLf, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput & "x" & vbLf).dctRStatements.Keys
+        Assert.Equal(2, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(129, lstScriptPos(1))
 
         strInput = "#precomment1" & vbLf &
                    " # precomment2" & vbLf &
