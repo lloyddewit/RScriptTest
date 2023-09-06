@@ -805,6 +805,13 @@ Public Class clsRScriptTestUnit
                 "data_book$get_graphs(data_name = ""Data"", graph_name = ""last_graph"")" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+        Assert.Equal(strInput, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(4, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(53, lstScriptPos(1))
+        Assert.Equal(413, lstScriptPos(2))
+        Assert.Equal(500, lstScriptPos(3))
 
         ' https://github.com/africanmathsinitiative/R-Instat/issues/7095  
         strInput = "ifelse(year_2 > 30, 1, 0)" & vbLf
