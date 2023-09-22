@@ -21,10 +21,10 @@ Public Class clsRScriptTestUnit
         'test lexeme list - separators, brackets, line feeds, user-defined operators and variable names with '.' and '_'
         lstExpected = New List(Of String)(New String() {",", "ae", ";", "af", vbCr,
                 "ag", vbLf, "(", "ah", ")", vbCrLf, "ai", "{", "aj", "}", "ak", "[", "al", "]",
-                "al", "[[", "am", "]]", "_ao", "%>%", ".ap", "%aq%", ".ar_2", "%asat%",
+                "al", "[[", "am", "]]", "_ao", "%>%", "|>", ".ap", "%aq%", ".ar_2", "%asat%",
                 "au_av.awax"})
         lstActual = clsRScript.GetLstLexemes(
-                ",ae;af" & vbCr & "ag" & vbLf & "(ah)" & vbCrLf & "ai{aj}ak[al]al[[am]]_ao%>%.ap" &
+                ",ae;af" & vbCr & "ag" & vbLf & "(ah)" & vbCrLf & "ai{aj}ak[al]al[[am]]_ao%>%|>.ap" &
                 "%aq%.ar_2%asat%au_av.awax")
         Assert.Equal(lstExpected, lstActual)
 
@@ -797,7 +797,7 @@ Public Class clsRScriptTestUnit
 
         ' https://github.com/africanmathsinitiative/R-Instat/issues/7095  
         strInput = "Data <- data_book$get_data_frame(data_name = ""Data"")" & vbLf &
-                "last_graph <- ggplot2::ggplot(data = Data %>% dplyr::filter(rain > 0.85), mapping = ggplot2::aes(y = rain, x = make_factor("""")))" &
+                "last_graph <- ggplot2::ggplot(data = Data |> dplyr::filter(rain > 0.85), mapping = ggplot2::aes(y = rain, x = make_factor("""")))" &
                     " + ggplot2::geom_boxplot(varwidth = TRUE, coef = 2) + theme_grey()" &
                     " + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5))" &
                     " + ggplot2::xlab(NULL) + ggplot2::facet_wrap(facets = ~ Name, drop = FALSE)" & vbLf &
@@ -810,8 +810,8 @@ Public Class clsRScriptTestUnit
         Assert.Equal(4, lstScriptPos.Count)
         Assert.Equal(0, lstScriptPos(0))
         Assert.Equal(53, lstScriptPos(1))
-        Assert.Equal(413, lstScriptPos(2))
-        Assert.Equal(500, lstScriptPos(3))
+        Assert.Equal(412, lstScriptPos(2))
+        Assert.Equal(499, lstScriptPos(3))
 
         ' https://github.com/africanmathsinitiative/R-Instat/issues/7095  
         strInput = "ifelse(year_2 > 30, 1, 0)" & vbLf
