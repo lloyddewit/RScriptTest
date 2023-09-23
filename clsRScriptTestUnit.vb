@@ -1,3 +1,4 @@
+Imports System.Collections.Specialized
 Imports Xunit
 
 Public Class clsRScriptTestUnit
@@ -20,10 +21,10 @@ Public Class clsRScriptTestUnit
         'test lexeme list - separators, brackets, line feeds, user-defined operators and variable names with '.' and '_'
         lstExpected = New List(Of String)(New String() {",", "ae", ";", "af", vbCr,
                 "ag", vbLf, "(", "ah", ")", vbCrLf, "ai", "{", "aj", "}", "ak", "[", "al", "]",
-                "al", "[[", "am", "]]", "_ao", "%>%", ".ap", "%aq%", ".ar_2", "%asat%",
+                "al", "[[", "am", "]]", "_ao", "%>%", "|>", ".ap", "%aq%", ".ar_2", "%asat%",
                 "au_av.awax"})
         lstActual = clsRScript.GetLstLexemes(
-                ",ae;af" & vbCr & "ag" & vbLf & "(ah)" & vbCrLf & "ai{aj}ak[al]al[[am]]_ao%>%.ap" &
+                ",ae;af" & vbCr & "ag" & vbLf & "(ah)" & vbCrLf & "ai{aj}ak[al]al[[am]]_ao%>%|>.ap" &
                 "%aq%.ar_2%asat%au_av.awax")
         Assert.Equal(lstExpected, lstActual)
 
@@ -463,10 +464,17 @@ Public Class clsRScriptTestUnit
         strInput = "x[3:5]<-13:15;names(x)[3]<-"" Three""" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+        Dim lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(2, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(14, lstScriptPos(1))
 
         strInput = " f1(f2(),f3(a),f4(b=1),f5(c=2,3),f6(4,d=5),f7(,),f8(,,),f9(,,,),f10(a,,))" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(" f1(f2(),f3(a),f4(b =1),f5(c =2,3),f6(4,d =5),f7(,),f8(,,),f9(,,,),f10(a,,))" & vbLf, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(1, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
 
         strInput = "f0(f1(),f2(a),f3(f4()),f5(f6(f7(b))))" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
@@ -527,10 +535,18 @@ Public Class clsRScriptTestUnit
         strInput = "df[[""a""]]" & vbLf & "lst[[""a""]][[""b""]]" & vbLf 'same as 'df$a' and 'lst$a$b'
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(2, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(10, lstScriptPos(1))
 
         strInput = "x<-""a"";df[x]" & vbLf 'same as 'df$a' and 'lst$a$b'
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(2, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(7, lstScriptPos(1))
 
         strInput = "df<-data.frame(x = 1:10, y = 11:20, z = letters[1:10])" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
@@ -539,6 +555,10 @@ Public Class clsRScriptTestUnit
         strInput = "x[3:5]<-13:15;names(x)[3]<-""Three""" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(2, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(14, lstScriptPos(1))
 
         strInput = "data_book$display_daily_table(data_name = ""dodoma"", climatic_element = ""rain"", " &
                    "date_col = ""Date"", year_col = ""year"", Misscode = ""m"", monstats = c(sum = ""sum""))" & vbLf
@@ -570,10 +590,23 @@ Public Class clsRScriptTestUnit
                    "data_book$get_graphs(data_name = ""dodoma"", graph_name = ""last_graph"")" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(4, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(139, lstScriptPos(1))
+        Assert.Equal(534, lstScriptPos(2))
+        Assert.Equal(623, lstScriptPos(3))
 
         strInput = "a->b" & vbLf & "c->>d" & vbLf & "e<-f" & vbLf & "g<<-h" & vbLf & "i=j" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(5, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(5, lstScriptPos(1))
+        Assert.Equal(11, lstScriptPos(2))
+        Assert.Equal(16, lstScriptPos(3))
+        Assert.Equal(22, lstScriptPos(4))
 
         strInput = "x<-df$`a b`" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
@@ -618,6 +651,10 @@ Public Class clsRScriptTestUnit
         strInput = " a  [" & vbCr & "   1" & vbLf & "] -  b   [c (  d   )+ e  ]   /f (  g   [2 ]  ,   h[ " & vbCrLf & "3  ]  " & vbLf & " ,i [  4   ]* j  [   5] )  -   k[ l  [   m[ 6  ]   ]   ]" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(" a  [" & vbCr & "   1] -  b   [c(  d)+ e]   /f(  g   [2],   h[ " & vbCrLf & "3],i [  4]* j  [   5]) -   k[ l  [   m[ 6]]]" & vbLf, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput & "x" & vbLf).dctRStatements.Keys
+        Assert.Equal(2, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(129, lstScriptPos(1))
 
         strInput = "#precomment1" & vbLf &
                    " # precomment2" & vbLf &
@@ -627,37 +664,93 @@ Public Class clsRScriptTestUnit
                    " a  /(   b)*( c)  +(   d- e)  /   f *g  +(((   d- e)  /   f)* g)   #comment3" & vbLf &
                    "#comment 4" & vbLf &
                    " a  +   b  +     c" & vbLf & vbLf & vbLf &
-                   "  #comment5" & vbLf & "   # comment6 #comment7" & vbLf &
+                   "  #comment5" & vbLf &
+                   "   # comment6 #comment7" & vbLf &
                    "endSyntacticName" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(5, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(118, lstScriptPos(1))
+        Assert.Equal(236, lstScriptPos(2))
+        Assert.Equal(313, lstScriptPos(3))
+        Assert.Equal(343, lstScriptPos(4))
+
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
+        Assert.Equal("f1(f2(),f3(a),f4(b =1))" & vbLf &
+                     "f0(o4a =o4b,o4c =(o8a+o8b)*(o8c-o8d),o4d =f4a(o6e =o6f,o6g =o6h))" & vbLf &
+                     "a/(b)*(c)+(d-e)/f*g+(((d-e)/f)*g)" & vbLf &
+                     "a+b+c" & vbLf &
+                     "endSyntacticName" & vbLf,
+                     strActual)
 
         strInput = "#comment1" & vbLf & "a#comment2" & vbCr & " b #comment3" & vbCrLf & "#comment4" & vbLf & "  c  " & vbCrLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal("#comment1" & vbLf & "a#comment2" & vbLf & " b #comment3" & vbLf & "#comment4" & vbLf & "  c  " & vbLf, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(3, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(21, lstScriptPos(1))
+        Assert.Equal(35, lstScriptPos(2))
+
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
+        Assert.Equal("a" & vbLf & "b" & vbLf & "c" & vbLf, strActual)
 
         strInput = "#ignored comment"
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(vbLf, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(1, lstScriptPos.Count)
+
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
+        Assert.Equal(vbLf, strActual)
+        lstScriptPos = New RScript.clsRScript(strActual).dctRStatements.Keys
+        Assert.Equal(1, lstScriptPos.Count)
 
         strInput = "#ignored comment" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(vbLf, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(1, lstScriptPos.Count)
+
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
         Assert.Equal(vbLf, strActual)
 
         strInput = "f1()" & vbLf & "#ignored comment" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal("f1()" & vbLf, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(1, lstScriptPos.Count)
+
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
+        Assert.Equal("f1()" & vbLf, strActual)
 
         strInput = vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(vbLf, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(1, lstScriptPos.Count)
+
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
         Assert.Equal(vbLf, strActual)
 
         strInput = ""
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal("", strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(0, lstScriptPos.Count)
+
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
+        Assert.Equal("", strActual)
 
         strInput = Nothing
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal("", strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(0, lstScriptPos.Count)
+
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
         Assert.Equal("", strActual)
 
         ' Test string constants that contain line breaks
@@ -670,9 +763,31 @@ Public Class clsRScriptTestUnit
                    "x <- `a" & vbCrLf & "`" & vbLf &
                    "fn1(`bc " & vbCrLf & "j" & vbCrLf & "d`, e)" & vbLf &
                    "fn2( `f gh" & vbCrLf & "kl" & vbCrLf & "mno" & vbCrLf & "`,i)" & vbLf
-
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(9, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(10, lstScriptPos(1))
+        Assert.Equal(26, lstScriptPos(2))
+        Assert.Equal(42, lstScriptPos(3))
+        Assert.Equal(53, lstScriptPos(4))
+        Assert.Equal(72, lstScriptPos(5))
+        Assert.Equal(88, lstScriptPos(6))
+        Assert.Equal(99, lstScriptPos(7))
+        Assert.Equal(119, lstScriptPos(8))
+
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
+        Assert.Equal("x<-""a" & vbLf & """" & vbLf &
+                     "fn1(""bc " & vbLf & "d"",e)" & vbLf &
+                     "fn2(""f gh" & vbLf & """,i)" & vbLf &
+                     "x<-'a" & vbCr & vbCr & "'" & vbLf &
+                     "fn1('bc " & vbCr & vbCr & vbCr & vbCr & "d',e)" & vbLf &
+                     "fn2('f gh" & vbCr & "',i)" & vbLf &
+                     "x<-`a" & vbCrLf & "`" & vbLf &
+                     "fn1(`bc " & vbCrLf & "j" & vbCrLf & "d`,e)" & vbLf &
+                     "fn2(`f gh" & vbCrLf & "kl" & vbCrLf & "mno" & vbCrLf & "`,i)" & vbLf,
+                     strActual)
 
         ' https://github.com/africanmathsinitiative/R-Instat/issues/7095  
         strInput = "data_book$import_data(data_tables =list(data3 =clipr::read_clip_tbl(x =""Category    Feature    Ease_of_Use     Operating Systems" &
@@ -682,7 +797,7 @@ Public Class clsRScriptTestUnit
 
         ' https://github.com/africanmathsinitiative/R-Instat/issues/7095  
         strInput = "Data <- data_book$get_data_frame(data_name = ""Data"")" & vbLf &
-                "last_graph <- ggplot2::ggplot(data = Data %>% dplyr::filter(rain > 0.85), mapping = ggplot2::aes(y = rain, x = make_factor("""")))" &
+                "last_graph <- ggplot2::ggplot(data = Data |> dplyr::filter(rain > 0.85), mapping = ggplot2::aes(y = rain, x = make_factor("""")))" &
                     " + ggplot2::geom_boxplot(varwidth = TRUE, coef = 2) + theme_grey()" &
                     " + ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5))" &
                     " + ggplot2::xlab(NULL) + ggplot2::facet_wrap(facets = ~ Name, drop = FALSE)" & vbLf &
@@ -690,6 +805,13 @@ Public Class clsRScriptTestUnit
                 "data_book$get_graphs(data_name = ""Data"", graph_name = ""last_graph"")" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+        Assert.Equal(strInput, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(4, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(53, lstScriptPos(1))
+        Assert.Equal(412, lstScriptPos(2))
+        Assert.Equal(499, lstScriptPos(3))
 
         ' https://github.com/africanmathsinitiative/R-Instat/issues/7095  
         strInput = "ifelse(year_2 > 30, 1, 0)" & vbLf
