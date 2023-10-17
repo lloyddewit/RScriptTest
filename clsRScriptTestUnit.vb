@@ -502,6 +502,10 @@ Public Class clsRScriptTestUnit
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
 
+        'https://github.com/lloyddewit/RScript/issues/18
+        strInput = "weather[,1]<-As.Date(weather[,1],format = ""%m/%d/%Y"")" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
 
         'TODO end
 
