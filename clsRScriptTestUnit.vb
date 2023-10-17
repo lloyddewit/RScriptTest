@@ -461,54 +461,6 @@ Public Class clsRScriptTestUnit
     Sub TestGetAsExecutableScript()
         Dim strInput, strActual As String
 
-        'TODO start
-        strInput = "a[]" & vbLf
-        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal(strInput, strActual)
-
-        strInput = "a[,]" & vbLf
-        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal(strInput, strActual)
-
-        strInput = "a[,,]" & vbLf
-        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal(strInput, strActual)
-
-        strInput = "a[,,,]" & vbLf
-        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal(strInput, strActual)
-
-        strInput = "a[b,]" & vbLf
-        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal(strInput, strActual)
-
-        strInput = "a[,c]" & vbLf
-        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal(strInput, strActual)
-
-        strInput = "a[b,c]" & vbLf
-        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal(strInput, strActual)
-
-        strInput = "a[""b"",]" & vbLf
-        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal(strInput, strActual)
-
-        strInput = "a[,""c"",1]" & vbLf
-        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal(strInput, strActual)
-
-        strInput = "a[-1,1:2,,x<5|x>7]" & vbLf
-        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal(strInput, strActual)
-
-        'https://github.com/lloyddewit/RScript/issues/18
-        strInput = "weather[,1]<-As.Date(weather[,1],format = ""%m/%d/%Y"")" & vbLf
-        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal(strInput, strActual)
-
-        'TODO end
-
         strInput = "x[3:5]<-13:15;names(x)[3]<-"" Three""" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
@@ -576,14 +528,6 @@ Public Class clsRScriptTestUnit
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
 
-        'TODO start
-        'strInput = "a[,b]" & vbLf
-        'strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        'Assert.Equal(strInput, strActual)
-
-
-        'TODO end
-
         strInput = "a[[1]]-b[[c(d)+e]]/f(g[[2]],h[[3]],i[[4]]*j[[5]])-k[[l[[m[6]]]]]" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
@@ -615,6 +559,96 @@ Public Class clsRScriptTestUnit
         Assert.Equal(2, lstScriptPos.Count)
         Assert.Equal(0, lstScriptPos(0))
         Assert.Equal(14, lstScriptPos(1))
+
+        strInput = "a[]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a[,]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a[,,]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a[,,,]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a[b,]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a[,c]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a[b,c]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a[""b"",]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a[,""c"",1]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a[-1,1:2,,x<5|x>7]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        'https://github.com/lloyddewit/RScript/issues/18
+        strInput = "weather[,1]<-As.Date(weather[,1],format = ""%m/%d/%Y"")" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = " a[]#comment" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a [,]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a[ ,,] #comment" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a[, ,,]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a[b, ]   #comment" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal("a[b,]   #comment" & vbLf, strActual)
+
+        strInput = "a [  ,   c    ]     " & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal("a [  ,   c]     " & vbLf, strActual)
+
+        strInput = "#comment" & vbLf & "a[b,c]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a[ ""b""  ,]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "a[,#comment" & vbLf & """c"",  1 ]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal("a[,#comment" & vbLf & """c"",  1]" & vbLf, strActual)
+
+        strInput = "a[ -1 , 1  :   2    ,     ,      x <  5   |    x      > 7  ]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal("a[ -1 , 1  :   2    ,     ,      x <  5   |    x      > 7]" & vbLf, strActual)
+
+        'https://github.com/lloyddewit/RScript/issues/18
+        strInput = " weather  [   ,  #comment" & vbLf & "  1     ] <-  As.Date   (weather     [#comment" & vbLf & " ,  1   ]    ,    format =  ""%m/%d/%Y""    )     " & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(" weather  [   ,  #comment" & vbLf & "  1] <-  As.Date(weather     [#comment" & vbLf & " ,  1],    format =  ""%m/%d/%Y"")     " & vbLf, strActual)
 
         strInput = "data_book$display_daily_table(data_name = ""dodoma"", climatic_element = ""rain"", " &
                    "date_col = ""Date"", year_col = ""year"", Misscode = ""m"", monstats = c(sum = ""sum""))" & vbLf
