@@ -605,6 +605,10 @@ Public Class clsRScriptTestUnit
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
 
+        strInput = "dat <- dat[order(dat$tree, dat$dir), ]" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal("dat <- dat[order(dat$tree, dat$dir),]" & vbLf, strActual)
+
         strInput = " a[]#comment" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
