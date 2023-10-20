@@ -461,6 +461,12 @@ Public Class clsRScriptTestUnit
     Sub TestGetAsExecutableScript()
         Dim strInput, strActual As String
 
+        'TODO START
+        strInput = "#comment" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+        'TODO end
+
         strInput = "x[3:5]<-13:15;names(x)[3]<-"" Three""" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
