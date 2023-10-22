@@ -829,7 +829,7 @@ Public Class clsRScriptTestUnit
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
         Assert.Equal(vbLf, strActual)
 
-        strInput = "f1()" & vbLf & "# not ignored comment" & vbLf
+        strInput = "f1()" & vbLf & "# not ignored comment" & vbCrLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
         lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
@@ -839,6 +839,14 @@ Public Class clsRScriptTestUnit
 
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
         Assert.Equal("f1()" & vbLf & vbLf, strActual)
+
+        strInput = "f1()" & vbLf & "# not ignored comment" & vbLf & "# not ignored comment2" & vbCr & " " & vbCrLf & "# not ignored comment3"
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput & vbLf, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(2, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(5, lstScriptPos(1))
 
         strInput = vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
