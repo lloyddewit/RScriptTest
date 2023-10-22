@@ -157,7 +157,7 @@ Public Class clsRScriptTestUnit
         strInput = "#" & vbLf & "c#" & vbLf & "ca#" & vbLf & "d~#" & vbLf & " #" &
                 vbLf & "  #~!@#$%^&*()_[] {} \|;:',./<>?" & vbLf & "#cb" & vbLf & "#cba" & vbLf &
                 "# "","" cbaa " & vbLf & "#" & vbCr & "#cc" & vbCr &
-                "#cca" & vbCrLf & "# ccaa " & vbCrLf & "#" & vbLf & "e+f#" & vbLf & " #ignored comment"
+                "#cca" & vbCrLf & "# ccaa " & vbCrLf & "#" & vbLf & "e+f#" & vbLf & " #not ignored comment"
         lstInput = clsRScript.GetLstLexemes(strInput)
         strExpected = "#(RComment), " &
                 vbLf & "(RNewLine), c(RSyntacticName), #(RComment), " &
@@ -174,7 +174,7 @@ Public Class clsRScriptTestUnit
                 vbCrLf & "(RNewLine), # ccaa (RComment), " &
                 vbCrLf & "(RNewLine), #(RComment), " &
                 vbLf & "(RNewLine), e(RSyntacticName), +(ROperatorBinary), f(RSyntacticName), #(RComment), " &
-                vbLf & "(REndScript), "
+                vbLf & "(REndScript),  (RSpace), #not ignored comment(RComment), "
 
         strActual = GetLstTokensAsString(clsRScript.GetLstTokens(lstInput))
         Assert.Equal(strExpected, strActual)
@@ -809,9 +809,9 @@ Public Class clsRScriptTestUnit
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
         Assert.Equal("a" & vbLf & "b" & vbLf & "c" & vbLf, strActual)
 
-        strInput = "#ignored comment"
+        strInput = "#not ignored comment"
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal(vbLf, strActual)
+        Assert.Equal(strInput & vbLf, strActual)
         lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
         Assert.Equal(1, lstScriptPos.Count)
 
@@ -820,23 +820,25 @@ Public Class clsRScriptTestUnit
         lstScriptPos = New RScript.clsRScript(strActual).dctRStatements.Keys
         Assert.Equal(1, lstScriptPos.Count)
 
-        strInput = "#ignored comment" & vbLf
+        strInput = "#not ignored comment" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal(vbLf, strActual)
+        Assert.Equal(strInput, strActual)
         lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
         Assert.Equal(1, lstScriptPos.Count)
 
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
         Assert.Equal(vbLf, strActual)
 
-        strInput = "f1()" & vbLf & "#ignored comment" & vbLf
+        strInput = "f1()" & vbLf & "# not ignored comment" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal("f1()" & vbLf, strActual)
+        Assert.Equal(strInput, strActual)
         lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
-        Assert.Equal(1, lstScriptPos.Count)
+        Assert.Equal(2, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(5, lstScriptPos(1))
 
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript(False)
-        Assert.Equal("f1()" & vbLf, strActual)
+        Assert.Equal("f1()" & vbLf & vbLf, strActual)
 
         strInput = vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
