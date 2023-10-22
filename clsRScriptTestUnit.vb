@@ -568,6 +568,33 @@ Public Class clsRScriptTestUnit
         Assert.Equal(0, lstScriptPos(0))
         Assert.Equal(14, lstScriptPos(1))
 
+        strInput = "x[3:5]<-13:15;" & vbLf & "names(x)[3]<-""Three""" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(3, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(14, lstScriptPos(1))
+        Assert.Equal(15, lstScriptPos(2))
+
+        strInput = "x[3:5]<-13:15;" & vbCrLf & "names(x)[3]<-""Three""" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal("x[3:5]<-13:15;" & vbLf & "names(x)[3]<-""Three""" & vbLf, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(3, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(14, lstScriptPos(1))
+        Assert.Equal(16, lstScriptPos(2))
+
+        strInput = "x[3:5]<-13:15;#comment" & vbLf & "names(x)[3]<-""Three""" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(3, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(14, lstScriptPos(1))
+        Assert.Equal(23, lstScriptPos(2))
+
         strInput = "a[]" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
@@ -847,6 +874,11 @@ Public Class clsRScriptTestUnit
         Assert.Equal(2, lstScriptPos.Count)
         Assert.Equal(0, lstScriptPos(0))
         Assert.Equal(5, lstScriptPos(1))
+
+        'issue lloyddewit/rscript#20
+        strInput = "# Code run from Script Window (all text)" & Environment.NewLine & "1"
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput & vbLf, strActual)
 
         strInput = vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
