@@ -462,7 +462,7 @@ Public Class clsRScriptTestUnit
         Dim strInput, strActual As String
 
         'TODO START
-        strInput = "#comment" & vbLf
+        strInput = "?log" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
         'TODO end
