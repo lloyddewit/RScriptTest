@@ -461,12 +461,6 @@ Public Class clsRScriptTestUnit
     Sub TestGetAsExecutableScript()
         Dim strInput, strActual As String
 
-        'TODO START
-        strInput = "?log" & vbLf
-        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal(strInput, strActual)
-        'TODO end
-
         strInput = "x[3:5]<-13:15;names(x)[3]<-"" Three""" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
@@ -995,6 +989,11 @@ Public Class clsRScriptTestUnit
         Assert.Equal(strInput, strActual)
 
         strInput = "read_clip_tbl(x = ""Ease_of_Use" & vbTab & "Hides R by default to prevent \""code shock\""" & vbTab & "  1"", header = TRUE)" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        'issue lloyddewit/rscript#17
+        strInput = "?log" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
 
