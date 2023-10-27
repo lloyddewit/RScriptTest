@@ -461,10 +461,56 @@ Public Class clsRScriptTestUnit
     Sub TestGetAsExecutableScript()
         Dim strInput, strActual As String
 
+        'TODO
+        'strInput = "complete" &
+        '        vbLf & "complete()" &
+        '        vbLf & "complete(a[b],c[[d]])" &
+        '        vbLf & "complete #" &
+        '        vbLf & "complete " &
+        '        vbLf & "complete + !e" &
+        '        vbLf & "complete() -f" &
+        '        vbLf & "complete() * g~" &
+        '        vbLf & "incomplete::" &
+        '        vbLf &
+        '        vbLf & "incomplete::h /i::: " & vbLf & "ia" &
+        '        vbLf & "incomplete %>% #comment" & vbLf & "ib" &
+        '        vbLf & "incomplete(" & vbLf & "ic)" &
+        '        vbLf & "incomplete()[id " & vbLf & "]" &
+        '        vbLf & "incomplete([[j[k]]]  " & vbLf & ")" &
+        '        vbLf & "incomplete >= " & vbLf & "  #comment " & vbLf & vbLf & "l" & vbLf
+
+        strInput = "complete() * g~" &
+                vbLf & "incomplete::" &
+                vbLf &
+                vbLf & "incomplete::h /i::: " & vbLf & "ia" &
+                vbLf & "incomplete %>% #comment" & vbLf & "ib" &
+                vbLf & "incomplete(" & vbLf & "ic)" &
+                vbLf & "incomplete()[id " & vbLf & "]" &
+                vbLf & "incomplete(ie[[j[k]]]  " & vbLf & ")" &
+                vbLf & "incomplete >= " & vbLf & "  #comment " & vbLf & vbLf & "l" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal("complete() * g~" &
+                vbLf & "incomplete::" &
+                vbLf &
+                vbLf & "incomplete::h /i::: " & vbLf & "ia" &
+                vbLf & "incomplete %>% #comment" & vbLf & "ib" &
+                vbLf & "incomplete(" & vbLf & "ic)" &
+                vbLf & "incomplete()[id " & vbLf & "]" &
+                vbLf & "incomplete(ie[[j[k]]])" &
+                vbLf & "incomplete >= " & vbLf & vbLf & vbLf & "l" & vbLf,
+                strActual)
+        Dim lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(2, lstScriptPos.Count)
+        Assert.Equal(0, lstScriptPos(0))
+        Assert.Equal(14, lstScriptPos(1))
+
+
+
+
         strInput = "x[3:5]<-13:15;names(x)[3]<-"" Three""" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
-        Dim lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
         Assert.Equal(2, lstScriptPos.Count)
         Assert.Equal(0, lstScriptPos(0))
         Assert.Equal(14, lstScriptPos(1))
