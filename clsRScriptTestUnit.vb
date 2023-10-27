@@ -460,49 +460,30 @@ Public Class clsRScriptTestUnit
     <Fact>
     Sub TestGetAsExecutableScript()
         Dim strInput, strActual As String
+        Dim lstScriptPos As ICollection
 
         'TODO
-        'strInput = "complete" &
-        '        vbLf & "complete()" &
-        '        vbLf & "complete(a[b],c[[d]])" &
-        '        vbLf & "complete #" &
-        '        vbLf & "complete " &
-        '        vbLf & "complete + !e" &
-        '        vbLf & "complete() -f" &
-        '        vbLf & "complete() * g~" &
-        '        vbLf & "incomplete::" &
-        '        vbLf &
-        '        vbLf & "incomplete::h /i::: " & vbLf & "ia" &
-        '        vbLf & "incomplete %>% #comment" & vbLf & "ib" &
-        '        vbLf & "incomplete(" & vbLf & "ic)" &
-        '        vbLf & "incomplete()[id " & vbLf & "]" &
-        '        vbLf & "incomplete([[j[k]]]  " & vbLf & ")" &
-        '        vbLf & "incomplete >= " & vbLf & "  #comment " & vbLf & vbLf & "l" & vbLf
+        'strInput = "1+2" & vbLf &
+        '           "+3" & vbLf
+        'strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        'Assert.Equal(strInput, strActual)
 
-        strInput = "complete() * g~" &
-                vbLf & "incomplete::" &
-                vbLf &
-                vbLf & "incomplete::h /i::: " & vbLf & "ia" &
-                vbLf & "incomplete %>% #comment" & vbLf & "ib" &
-                vbLf & "incomplete(" & vbLf & "ic)" &
-                vbLf & "incomplete()[id " & vbLf & "]" &
-                vbLf & "incomplete(ie[[j[k]]]  " & vbLf & ")" &
-                vbLf & "incomplete >= " & vbLf & "  #comment " & vbLf & vbLf & "l" & vbLf
+        strInput = "?a" & vbLf &
+                   "? b" & vbLf &
+                   " +  c" & vbLf &
+                   "  -   d +#comment1" & vbLf &
+                   "(!e) - #comment2" & vbLf &
+                   "(~f) +" & vbLf &
+                   "(+g) - " & vbLf &
+                   "(-h)" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal("complete() * g~" &
-                vbLf & "incomplete::" &
-                vbLf &
-                vbLf & "incomplete::h /i::: " & vbLf & "ia" &
-                vbLf & "incomplete %>% #comment" & vbLf & "ib" &
-                vbLf & "incomplete(" & vbLf & "ic)" &
-                vbLf & "incomplete()[id " & vbLf & "]" &
-                vbLf & "incomplete(ie[[j[k]]])" &
-                vbLf & "incomplete >= " & vbLf & vbLf & vbLf & "l" & vbLf,
-                strActual)
-        Dim lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
-        Assert.Equal(2, lstScriptPos.Count)
-        Assert.Equal(0, lstScriptPos(0))
-        Assert.Equal(14, lstScriptPos(1))
+        Assert.Equal("?a" & vbLf &
+                     "? b" & vbLf &
+                     " +  c" & vbLf &
+                     "  -   d +(!e) -(~f) +(+g) -(-h)" & vbLf,
+                     strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(4, lstScriptPos.Count)
 
 
 
