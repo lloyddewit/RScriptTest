@@ -462,32 +462,6 @@ Public Class clsRScriptTestUnit
         Dim strInput, strActual As String
         Dim lstScriptPos As ICollection
 
-        'TODO
-        'strInput = "1+2" & vbLf &
-        '           "+3" & vbLf
-        'strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        'Assert.Equal(strInput, strActual)
-
-        strInput = "?a" & vbLf &
-                   "? b" & vbLf &
-                   " +  c" & vbLf &
-                   "  -   d +#comment1" & vbLf &
-                   "(!e) - #comment2" & vbLf &
-                   "(~f) +" & vbLf &
-                   "(+g) - " & vbLf &
-                   "(-h)" & vbLf
-        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
-        Assert.Equal("?a" & vbLf &
-                     "? b" & vbLf &
-                     " +  c" & vbLf &
-                     "  -   d +(!e) -(~f) +(+g) -(-h)" & vbLf,
-                     strActual)
-        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
-        Assert.Equal(4, lstScriptPos.Count)
-
-
-
-
         strInput = "x[3:5]<-13:15;names(x)[3]<-"" Three""" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
@@ -1023,6 +997,25 @@ Public Class clsRScriptTestUnit
         strInput = "?log" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+
+        'issue lloyddewit/rscript#21
+        strInput = "?a" & vbLf &
+                   "? b" & vbLf &
+                   " +  c" & vbLf &
+                   "  -   d +#comment1" & vbLf &
+                   "(!e) - #comment2" & vbLf &
+                   "(~f) +" & vbLf &
+                   "(+g) - " & vbLf &
+                   "(-h)" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal("?a" & vbLf &
+                     "? b" & vbLf &
+                     " +  c" & vbLf &
+                     "  -   d +(!e) -(~f) +(+g) -(-h)" & vbLf,
+                     strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(4, lstScriptPos.Count)
+
 
     End Sub
 
