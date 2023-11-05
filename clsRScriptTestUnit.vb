@@ -460,11 +460,12 @@ Public Class clsRScriptTestUnit
     <Fact>
     Sub TestGetAsExecutableScript()
         Dim strInput, strActual As String
+        Dim lstScriptPos As ICollection
 
         strInput = "x[3:5]<-13:15;names(x)[3]<-"" Three""" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
-        Dim lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
         Assert.Equal(2, lstScriptPos.Count)
         Assert.Equal(0, lstScriptPos(0))
         Assert.Equal(14, lstScriptPos(1))
@@ -996,6 +997,25 @@ Public Class clsRScriptTestUnit
         strInput = "?log" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
+
+        'issue lloyddewit/rscript#21
+        strInput = "?a" & vbLf &
+                   "? b" & vbLf &
+                   " +  c" & vbLf &
+                   "  -   d +#comment1" & vbLf &
+                   "(!e) - #comment2" & vbLf &
+                   "(~f) +" & vbLf &
+                   "(+g) - " & vbLf &
+                   "(-h)" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal("?a" & vbLf &
+                     "? b" & vbLf &
+                     " +  c" & vbLf &
+                     "  -   d +(!e) -(~f) +(+g) -(-h)" & vbLf,
+                     strActual)
+        lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
+        Assert.Equal(4, lstScriptPos.Count)
+
 
     End Sub
 
