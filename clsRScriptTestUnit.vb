@@ -1016,6 +1016,15 @@ Public Class clsRScriptTestUnit
         lstScriptPos = New RScript.clsRScript(strInput).dctRStatements.Keys
         Assert.Equal(4, lstScriptPos.Count)
 
+        'issue lloyddewit/rscript#32
+        strInput = "??log" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "??a" & vbLf &
+                   "?? b" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
 
     End Sub
 
