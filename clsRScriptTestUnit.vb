@@ -1,4 +1,9 @@
 Imports System.Collections.Specialized
+Imports Newtonsoft.Json.Linq
+Imports System.ComponentModel
+Imports System.Data.Common
+Imports System.Reflection.Emit
+Imports System.Text.RegularExpressions
 Imports Xunit
 
 Public Class clsRScriptTestUnit
@@ -84,18 +89,18 @@ Public Class clsRScriptTestUnit
                 "+(ROperatorBinary), 1234567890(RSyntacticName), +(ROperatorBinary), " &
                 "2.3(RSyntacticName), +(ROperatorBinary), 1e6(RSyntacticName), +(ROperatorBinary), " &
                 "abcdefghijklmnopqrstuvwxyz(RSyntacticName), +(ROperatorBinary), `a`(RSyntacticName), " &
-                "+(ROperatorUnaryRight), `a b`(RSyntacticName), +(ROperatorUnaryRight), `[[`(RSyntacticName), " &
-                "+(ROperatorUnaryRight), `d,ae;af`(RSyntacticName), +(ROperatorUnaryRight), " &
-                "`(ah)`(RSyntacticName), +(ROperatorUnaryRight), `ai{aj}`(RSyntacticName), +(ROperatorUnaryRight), " &
-                "`~!@#$%^&*()_[] {} \|;:',./<>?`(RSyntacticName), +(ROperatorUnaryRight), " &
-                "`%%a_2ab%`(RSyntacticName), +(ROperatorUnaryRight), `%ac%`(RSyntacticName), " &
-                "+(ROperatorUnaryRight), `[[""b""]]n[[[o][p]]]`(RSyntacticName), +(ROperatorUnaryRight), " &
-                "`if`(RSyntacticName), +(ROperatorUnaryRight), `else`(RSyntacticName), +(ROperatorUnaryRight), " &
-                "`while`(RSyntacticName), +(ROperatorUnaryRight), `repeat`(RSyntacticName), " &
-                "+(ROperatorUnaryRight), `for`(RSyntacticName), +(ROperatorUnaryRight), `in`(RSyntacticName), " &
-                "+(ROperatorUnaryRight), `function`(RSyntacticName), +(ROperatorUnaryRight), " &
-                "`return`(RSyntacticName), +(ROperatorUnaryRight), `else`(RSyntacticName), " &
-                "+(ROperatorUnaryRight), `next`(RSyntacticName), +(ROperatorUnaryRight), " &
+                "+(ROperatorBinary), `a b`(RSyntacticName), +(ROperatorBinary), `[[`(RSyntacticName), " &
+                "+(ROperatorBinary), `d,ae;af`(RSyntacticName), +(ROperatorBinary), " &
+                "`(ah)`(RSyntacticName), +(ROperatorBinary), `ai{aj}`(RSyntacticName), +(ROperatorBinary), " &
+                "`~!@#$%^&*()_[] {} \|;:',./<>?`(RSyntacticName), +(ROperatorBinary), " &
+                "`%%a_2ab%`(RSyntacticName), +(ROperatorBinary), `%ac%`(RSyntacticName), " &
+                "+(ROperatorBinary), `[[""b""]]n[[[o][p]]]`(RSyntacticName), +(ROperatorBinary), " &
+                "`if`(RSyntacticName), +(ROperatorBinary), `else`(RSyntacticName), +(ROperatorBinary), " &
+                "`while`(RSyntacticName), +(ROperatorBinary), `repeat`(RSyntacticName), " &
+                "+(ROperatorBinary), `for`(RSyntacticName), +(ROperatorBinary), `in`(RSyntacticName), " &
+                "+(ROperatorBinary), `function`(RSyntacticName), +(ROperatorBinary), " &
+                "`return`(RSyntacticName), +(ROperatorBinary), `else`(RSyntacticName), " &
+                "+(ROperatorBinary), `next`(RSyntacticName), +(ROperatorBinary), " &
                 "`break`(RSyntacticName), "
         Dim strActual As String = GetLstTokensAsString(clsRScript.GetLstTokens(lstInput))
         Assert.Equal(strExpected, strActual)
@@ -1023,6 +1028,36 @@ Public Class clsRScriptTestUnit
 
         strInput = "??a" & vbLf &
                    "?? b" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        'issue lloyddewit/rscript#16
+        strInput = """a""+""b""" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "  tfrmt(" & vbLf &
+           "  # specify columns in the data" & vbLf &
+           "  group = c(rowlbl1, grp)," & vbLf &
+           "  label = rowlbl2," & vbLf &
+           "  column = column, " & vbLf &
+           "  param = param," & vbLf &
+           "  value = value," & vbLf &
+           "  sorting_cols = c(ord1, ord2)," & vbLf &
+           "  # specify value formatting " & vbLf &
+           "  body_plan = body_plan(" & vbLf &
+           "  frmt_structure(group_val = "".default"", label_val = "".default"", frmt_combine(""{n} ({pct} %)""," & vbLf &
+           "                                                                    n = frmt(""xxx"")," & vbLf &
+           "                                                                                pct = frmt(""xx.x"")))," & vbLf &
+           "    frmt_structure(group_val = "".default"", label_val = ""n"", frmt(""xxx""))," & vbLf &
+           "    frmt_structure(group_val = "".default"", label_val = c(""Mean"", ""Median"", ""Min"", ""Max""), frmt(""xxx.x""))," & vbLf &
+           "    frmt_structure(group_val = "".default"", label_val = ""SD"", frmt(""xxx.xx""))," & vbLf &
+           "    frmt_structure(group_val = "".default"", label_val = "".default"", p = frmt_when("">0.99"" ~ "">0.99""," & vbLf &
+           "                                                                                 ""<0.001"" ~ ""<0.001""," & vbLf &
+           "                                                                                 TRUE ~ frmt(""x.xxx"", missing = """"))))) %>% " & vbLf &
+           "  print_to_gt(data_demog) %>% " & vbLf &
+           "  tab_options(" & vbLf &
+           "    container.width = 900)" & vbLf
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
 
