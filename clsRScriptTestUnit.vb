@@ -1061,6 +1061,47 @@ Public Class clsRScriptTestUnit
         strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
         Assert.Equal(strInput, strActual)
 
+        'issue lloyddewit/rscript#14
+        'Examples from https://www.tidyverse.org/blog/2023/04/base-vs-magrittr-pipe/
+        strInput = "x %>% f(1, .)" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "x |> f(1, y = _)" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "df %>% split(.$var)" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        'TODO curly brackets not yet supported
+        'strInput = "df %>% {split(.$x, .$y)}" & vbLf
+        'strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        'Assert.Equal(strInput, strActual)
+
+        strInput = "mtcars %>% .$cyl" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+
+        'Examples from https://stackoverflow.com/questions/67744604/what-does-pipe-greater-than-mean-in-r
+        strInput = "c(1:3, NA_real_) |> sum(na.rm = TRUE)" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "split(x = iris[-5], f = iris$Species) |> lapply(min) |> Do.call(what = rbind)" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "iris[iris$Sepal.Length > 7,] %>% subset(.$Species==""virginica"")" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
+        strInput = "1:3 |> sum" & vbLf
+        strActual = New RScript.clsRScript(strInput).GetAsExecutableScript()
+        Assert.Equal(strInput, strActual)
+
     End Sub
 
     Private Function GetLstTokensAsString(lstRTokens As List(Of RScript.clsRToken)) As String
